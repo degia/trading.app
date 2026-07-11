@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Transaction;
+use App\Services\TargetCalculationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -174,14 +175,9 @@ class DepositWithdrawal extends Component
                 'transaction_date' => $this->formDate,
                 'notes' => $this->formNotes ?: null,
             ]);
-
-            $newBalance = match ($this->formType) {
-                'deposit' => (float) $account->current_balance + round($this->formAmount, 2),
-                'withdrawal' => (float) $account->current_balance - round($this->formAmount, 2),
-            };
-
-            $account->update(['current_balance' => round($newBalance, 2)]);
         });
+
+        app(TargetCalculationService::class)->recalculateAllForAccount($account);
 
         $this->closeModal();
         $this->dispatch('refreshDashboard');
@@ -210,22 +206,11 @@ class DepositWithdrawal extends Component
             ->where('account_id', $account->id)
             ->findOrFail($this->deletingId);
 
-        DB::transaction(function () use ($txn, $account) {
-            $reverse = match ($txn->type) {
-                'deposit' => -(float) $txn->amount,
-                'withdrawal' => (float) $txn->amount,
-            };
-
-            $newBalance = (float) $account->current_balance + $reverse;
-
-            if ($newBalance < 0) {
-                session()->flash('error', 'Tidak bisa menghapus: saldo akan menjadi negatif.');
-                return;
-            }
-
-            $account->update(['current_balance' => round($newBalance, 2)]);
+        DB::transaction(function () use ($txn) {
             $txn->delete();
         });
+
+        app(TargetCalculationService::class)->recalculateAllForAccount($account);
 
         $this->showDeleteConfirm = false;
         $this->deletingId = null;

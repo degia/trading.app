@@ -7,6 +7,7 @@ use App\Models\AccountRule;
 use App\Models\DailyLog;
 use App\Models\Scopes\ActiveAccountScope;
 use App\Models\Target;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 
 class TargetCalculationService
@@ -209,6 +210,8 @@ class TargetCalculationService
             ->where('account_id', $account->id)
             ->delete();
 
+        $transactionsByDate = $this->getTransactionsByDate($account);
+
         $balance = (float) $account->initial_balance;
         $running5 = 0;
         $running10 = 0;
@@ -220,7 +223,26 @@ class TargetCalculationService
             ->orderBy('log_date')
             ->get();
 
+        $firstLogDate = $logs->first()?->log_date?->format('Y-m-d');
+        $lastLogDate = null;
+
+        foreach ($transactionsByDate as $dateKey => $txns) {
+            if ($firstLogDate && $dateKey < $firstLogDate) {
+                foreach ($txns as $txn) {
+                    $balance = $this->applyTransactionToBalance($balance, $txn);
+                }
+            }
+        }
+
         foreach ($logs as $log) {
+            $dateKey = $log->log_date->format('Y-m-d');
+
+            if (isset($transactionsByDate[$dateKey])) {
+                foreach ($transactionsByDate[$dateKey] as $txn) {
+                    $balance = $this->applyTransactionToBalance($balance, $txn);
+                }
+            }
+
             if ($log->status === 'day_off') {
                 $running5 = 0;
                 $running10 = 0;
@@ -272,8 +294,47 @@ class TargetCalculationService
                     'status' => $closing10,
                 ]);
             }
+
+            $lastLogDate = $dateKey;
         }
 
-        $account->update(['current_balance' => $balance]);
+        foreach ($transactionsByDate as $dateKey => $txns) {
+            if ($lastLogDate && $dateKey > $lastLogDate) {
+                foreach ($txns as $txn) {
+                    $balance = $this->applyTransactionToBalance($balance, $txn);
+                }
+            }
+        }
+
+        $account->update(['current_balance' => round($balance, 2)]);
+    }
+
+    private function getTransactionsByDate(Account $account): \Illuminate\Support\Collection
+    {
+        $initialDepositId = Transaction::withoutGlobalScope(ActiveAccountScope::class)
+            ->where('account_id', $account->id)
+            ->where('type', 'deposit')
+            ->orderBy('id')
+            ->value('id');
+
+        $query = Transaction::withoutGlobalScope(ActiveAccountScope::class)
+            ->where('account_id', $account->id)
+            ->orderBy('transaction_date')
+            ->orderBy('id');
+
+        if ($initialDepositId) {
+            $query->where('id', '!=', $initialDepositId);
+        }
+
+        return $query->get()->groupBy(fn ($t) => $t->transaction_date->format('Y-m-d'));
+    }
+
+    private function applyTransactionToBalance(float $balance, Transaction $txn): float
+    {
+        return match ($txn->type) {
+            'deposit' => $balance + (float) $txn->amount,
+            'withdrawal' => $balance - (float) $txn->amount,
+            default => $balance,
+        };
     }
 }

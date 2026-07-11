@@ -105,12 +105,7 @@ class DashboardOverview extends Component
         $account = $this->activeAccount;
         if (! $account) return 0;
 
-        $lastLog = DailyLog::withoutGlobalScope(ActiveAccountScope::class)
-            ->where('account_id', $account->id)
-            ->orderByDesc('log_date')
-            ->first();
-
-        return (float) ($lastLog?->balance ?? $account->current_balance);
+        return (float) $account->current_balance;
     }
 
     public function getSelectedMonthLabelProperty(): string
