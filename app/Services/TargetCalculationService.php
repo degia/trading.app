@@ -212,7 +212,7 @@ class TargetCalculationService
 
         $transactionsByDate = $this->getTransactionsByDate($account);
 
-        $balance = (float) $account->initial_balance;
+        $balance = 0;
         $running5 = 0;
         $running10 = 0;
         $target5Amount = $rules->getTarget1Amount($balance);
@@ -311,22 +311,12 @@ class TargetCalculationService
 
     private function getTransactionsByDate(Account $account): \Illuminate\Support\Collection
     {
-        $initialDepositId = Transaction::withoutGlobalScope(ActiveAccountScope::class)
-            ->where('account_id', $account->id)
-            ->where('type', 'deposit')
-            ->orderBy('id')
-            ->value('id');
-
-        $query = Transaction::withoutGlobalScope(ActiveAccountScope::class)
+        return Transaction::withoutGlobalScope(ActiveAccountScope::class)
             ->where('account_id', $account->id)
             ->orderBy('transaction_date')
-            ->orderBy('id');
-
-        if ($initialDepositId) {
-            $query->where('id', '!=', $initialDepositId);
-        }
-
-        return $query->get()->groupBy(fn ($t) => $t->transaction_date->format('Y-m-d'));
+            ->orderBy('id')
+            ->get()
+            ->groupBy(fn ($t) => $t->transaction_date->format('Y-m-d'));
     }
 
     private function applyTransactionToBalance(float $balance, Transaction $txn): float

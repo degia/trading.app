@@ -65,7 +65,7 @@
                 <span class="font-semibold text-warn">{{ $this->activeAccount->name ?? '—' }}</span>
             </p>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
             <input type="date" wire:model.live="dateFrom"
                    class="px-3 py-2 rounded-[9px] text-[12px] font-mono border dark:bg-white/[0.04] dark:border-white/[0.09] dark:text-[#f5f5f4] bg-black/[0.03] border-black/[0.08] text-[#0a0a0c] outline-none focus:border-profit/40 transition-colors cursor-pointer">
             <span class="text-[11px] dark:text-[#8b8b93] text-[#6b6b70]">s/d</span>

@@ -53,9 +53,9 @@
     }
 
     .light .glass-card {
-        background: rgba(255, 255, 255, 0.55);
-        border-color: var(--glass-border-l);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.82);
+        border-color: rgba(10, 10, 12, 0.10);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8);
     }
 
     .status-chip {
@@ -85,4 +85,18 @@
     .num-pos { color: var(--profit); }
     .num-neg { color: var(--loss); }
     .num-target { color: var(--target); }
+
+    .light .dark\:text-\[\#8b8b93\] { color: #55555e !important; }
+    .light .dark\:text-white { color: var(--ink) !important; }
+    .light .dark\:bg-white\/\[0\.06\] { background: rgba(0, 0, 0, 0.06) !important; }
+    .light .dark\:border-white\/\[0\.09\] { border-color: rgba(0, 0, 0, 0.10) !important; }
+    .light .dark\:hover\:text-white:hover { color: var(--ink) !important; }
+    .light table th { color: #4a4a52 !important; }
+    .light table td { color: #2a2a30 !important; }
+    .light table td.text-\[\#6b6b70\],
+    .light .text-\[\#6b6b70\] { color: #55555e !important; }
+    .light .num-pos { color: #0d9e6e !important; }
+    .light .num-neg { color: #d43048 !important; }
+    .light .num-target { color: #b8941e !important; }
+    .light .bg-glow { opacity: 0.3; }
 }

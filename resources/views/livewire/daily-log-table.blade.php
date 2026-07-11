@@ -43,7 +43,7 @@
 
     <div class="glass-card overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full border-collapse text-[13px] min-w-[700px]">
+            <table class="w-full border-collapse text-[13px] min-w-[900px]">
                 <thead>
                     <tr>
                         <th class="py-2.5 px-3 border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium w-[40px]">
@@ -54,10 +54,14 @@
                         <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Day</th>
                         <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Tanggal</th>
                         <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Balance</th>
-                        <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Running {{ $this->rules->target_1_pct }}%</th>
-                        <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Running {{ $this->rules->target_2_pct }}%</th>
-                        <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Profit</th>
-                        <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Loss</th>
+                        <th class="text-right py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Daily %</th>
+                        <th class="text-right py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Running {{ $this->rules->target_1_pct }}%</th>
+                        <th class="text-right py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Closing {{ $this->rules->target_1_pct }}%</th>
+                        <th class="text-right py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Running {{ $this->rules->target_2_pct }}%</th>
+                        <th class="text-right py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Closing {{ $this->rules->target_2_pct }}%</th>
+                        <th class="text-right py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Profit</th>
+                        <th class="text-right py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Loss</th>
+                        <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Notes</th>
                         <th class="text-right py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Aksi</th>
                     </tr>
                 </thead>
@@ -68,6 +72,9 @@
                             $target10 = $log->targets->firstWhere('target_type', 'target_2');
                             $running5 = $target5 ? (float) $target5->running_amount : 0;
                             $running10 = $target10 ? (float) $target10->running_amount : 0;
+                            $closing5 = $target5 ? (float) $target5->target_closing : 0;
+                            $closing10 = $target10 ? (float) $target10->target_closing : 0;
+                            $dailyPct = (float) $log->daily_percent;
                         @endphp
                         <tr class="border-b dark:border-white/[0.04] border-black/[0.04] dark:hover:bg-white/[0.02] hover:bg-black/[0.015] transition-colors">
                             <td class="py-3 px-3">
@@ -86,21 +93,29 @@
                             <td class="py-3 px-5 text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] text-[12px]">{{ $log->day_name }}</td>
                             <td class="py-3 px-5 font-mono text-[12px]">{{ $log->log_date->format('d/m/Y') }}</td>
                             <td class="py-3 px-5 font-mono font-medium">${{ number_format((float) $log->balance, 2) }}</td>
-                            <td class="py-3 px-5 font-mono text-[12px] {{ $running5 >= 0 ? 'num-pos' : 'num-neg' }}">
-                                @if($log->status !== 'day_off')${{ number_format($running5, 2) }}@else$0.00
-                                @endif
+                            <td class="py-3 px-5 font-mono text-[12px] text-right {{ $dailyPct >= 0 ? 'num-pos' : 'num-neg' }}">
+                                @if($log->status !== 'day_off'){{ number_format($dailyPct, 2) }}%@else—@endif
                             </td>
-                            <td class="py-3 px-5 font-mono text-[12px] {{ $running10 >= 0 ? 'num-pos' : 'num-neg' }}">
-                                @if($log->status !== 'day_off')${{ number_format($running10, 2) }}@else$0.00
-                                @endif
+                            <td class="py-3 px-5 font-mono text-[12px] text-right {{ $running5 >= 0 ? 'num-pos' : 'num-neg' }}">
+                                @if($log->status !== 'day_off')${{ number_format($running5, 2) }}@else—@endif
                             </td>
-                            <td class="py-3 px-5 font-mono text-[12px] num-pos">
-                                @if((float) $log->profit_amount > 0)${{ number_format((float) $log->profit_amount, 2) }}@else$0.00
-                                @endif
+                            <td class="py-3 px-5 font-mono text-[12px] text-right {{ $closing5 > 0 ? 'text-target dark:text-target' : 'num-pos' }}">
+                                @if($log->status !== 'day_off')${{ number_format($closing5, 2) }}@else—@endif
                             </td>
-                            <td class="py-3 px-5 font-mono text-[12px] num-neg">
-                                @if((float) $log->loss_amount > 0)${{ number_format((float) $log->loss_amount, 2) }}@else$0.00
-                                @endif
+                            <td class="py-3 px-5 font-mono text-[12px] text-right {{ $running10 >= 0 ? 'num-pos' : 'num-neg' }}">
+                                @if($log->status !== 'day_off')${{ number_format($running10, 2) }}@else—@endif
+                            </td>
+                            <td class="py-3 px-5 font-mono text-[12px] text-right {{ $closing10 > 0 ? 'text-target dark:text-target' : 'num-pos' }}">
+                                @if($log->status !== 'day_off')${{ number_format($closing10, 2) }}@else—@endif
+                            </td>
+                            <td class="py-3 px-5 font-mono text-[12px] text-right num-pos">
+                                @if((float) $log->profit_amount > 0)${{ number_format((float) $log->profit_amount, 2) }}@else—@endif
+                            </td>
+                            <td class="py-3 px-5 font-mono text-[12px] text-right num-neg">
+                                @if((float) $log->loss_amount > 0)${{ number_format((float) $log->loss_amount, 2) }}@else—@endif
+                            </td>
+                            <td class="py-3 px-5 text-[11px] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] max-w-[150px] truncate" @if($log->notes) title="{{ $log->notes }}" @endif>
+                                {{ $log->notes ?? '—' }}
                             </td>
                             <td class="py-3 px-5 text-right">
                                 <div class="flex items-center justify-end gap-1">
@@ -121,7 +136,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="py-12 px-5 text-center text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] font-body">
+                            <td colspan="14" class="py-12 px-5 text-center text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] font-body">
                                 Belum ada data trading untuk bulan ini.
                             </td>
                         </tr>

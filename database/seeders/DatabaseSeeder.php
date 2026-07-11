@@ -8,6 +8,7 @@ use App\Models\DailyLog;
 use App\Models\Target;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Services\TargetCalculationService;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
@@ -32,7 +33,7 @@ class DatabaseSeeder extends Seeder
             'name' => $name,
             'type' => $type,
             'initial_balance' => $initialBalance,
-            'current_balance' => $initialBalance,
+            'current_balance' => 0,
             'currency' => 'USD',
             'is_active' => true,
         ]);
@@ -159,5 +160,7 @@ class DatabaseSeeder extends Seeder
                 'notes' => 'Withdraw profit minggu pertama',
             ]);
         }
+
+        app(TargetCalculationService::class)->recalculateAllForAccount($account);
     }
 }

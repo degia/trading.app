@@ -31,7 +31,7 @@
                 </label>
                 <div class="flex items-center gap-3">
                     <input type="number" min="1" max="100" wire:model.live="target_1_pct"
-                           class="w-24 px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-mono
+                           class="w-24 px-3 py-2.5 rounded-xl dark:bg-white/5 dark:border-white/10 dark:text-white bg-black/[0.03] border-black/[0.08] text-[#0a0a0c] text-sm font-mono
                            focus:border-profit focus:ring-1 focus:ring-profit/30 outline-none transition-all">
                     <span class="text-sm dark:text-[#8b8b93] text-[#6b6b70]">% of balance</span>
                 </div>
@@ -43,7 +43,7 @@
                 </label>
                 <div class="flex items-center gap-3">
                     <input type="number" min="1" max="100" wire:model.live="target_2_pct"
-                           class="w-24 px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-mono
+                           class="w-24 px-3 py-2.5 rounded-xl dark:bg-white/5 dark:border-white/10 dark:text-white bg-black/[0.03] border-black/[0.08] text-[#0a0a0c] text-sm font-mono
                            focus:border-profit focus:ring-1 focus:ring-profit/30 outline-none transition-all">
                     <span class="text-sm dark:text-[#8b8b93] text-[#6b6b70]">% of balance</span>
                 </div>
@@ -72,7 +72,7 @@
                         class="px-4 py-2 rounded-xl text-xs font-semibold capitalize border transition-all duration-200
                         {{ in_array($day, $offDays)
                             ? 'bg-warn/15 border-warn/30 text-warn'
-                            : 'bg-white/5 border-white/10 dark:text-[#8b8b93] text-[#6b6b70] hover:text-white' }}">
+                            : 'dark:bg-white/5 dark:border-white/10 bg-black/[0.03] border-black/[0.08] dark:text-[#8b8b93] text-[#6b6b70] dark:hover:text-white hover:text-black' }}">
                     {{ $day }}
                 </button>
             @endforeach
