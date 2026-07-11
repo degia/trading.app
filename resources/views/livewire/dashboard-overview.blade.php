@@ -18,6 +18,8 @@
     },
     buildChart() {
         if (!this.chartData.data.length || !this.$refs.chartContainer) return;
+        if (this.chart) { this.chart.destroy(); this.chart = null; }
+        this.$refs.chartContainer.innerHTML = '';
         const c = this.getChartColors();
         this.chart = new ApexCharts(this.$refs.chartContainer, {
             chart: { type: 'area', height: 192, toolbar: { show: false }, fontFamily: 'Inter, sans-serif', background: 'transparent' },
@@ -90,7 +92,7 @@
                 @endif
             </div>
             @if(count($this->equityCurveData['data']) > 0)
-                <div x-ref="chartContainer" class="h-[192px]"></div>
+                <div x-ref="chartContainer" wire:ignore class="h-[192px]"></div>
             @else
                 <div class="h-[192px] flex items-center justify-center text-sm text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70]">
                     Chart akan muncul setelah ada data
