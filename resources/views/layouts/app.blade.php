@@ -10,25 +10,32 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
+    <script>
+        (function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.className=t;
+        if(t==='light'){document.body&&(document.body.className='font-body antialiased light');}})();
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.44.2/dist/apexcharts.min.js"></script>
 </head>
 <body class="font-body antialiased dark"
       x-data="{
-          theme: localStorage.getItem('theme') || 'dark',
           mobileNav: false,
           init() {
+              if (!Alpine.store('theme')) {
+                  Alpine.store('theme', localStorage.getItem('theme') || 'dark');
+              }
               this.applyTheme();
-              this.$watch('theme', () => this.applyTheme());
+              this.$watch('$store.theme', () => this.applyTheme());
           },
           applyTheme() {
-              localStorage.setItem('theme', this.theme);
-              document.documentElement.className = this.theme;
-              document.body.className = this.theme === 'dark' ? 'font-body antialiased' : 'font-body antialiased light';
+              const t = Alpine.store('theme');
+              localStorage.setItem('theme', t);
+              document.documentElement.className = t;
+              document.body.className = t === 'dark' ? 'font-body antialiased' : 'font-body antialiased light';
           },
           toggle() {
-              this.theme = this.theme === 'dark' ? 'light' : 'dark';
+              Alpine.store('theme', Alpine.store('theme') === 'dark' ? 'light' : 'dark');
           }
       }">
 
@@ -98,8 +105,8 @@
                             dark:bg-white/[0.08] dark:border-white/[0.09] bg-black/[0.06] border-black/[0.08]">
                         <div class="w-[22px] h-[22px] rounded-full absolute top-[2px] left-[2px] transition-transform duration-300 flex items-center justify-center text-[11px]
                             dark:bg-[#f5f5f4] bg-[#0a0a0c]"
-                             :class="theme === 'light' ? 'translate-x-[24px]' : 'translate-x-0'">
-                            <span x-text="theme === 'dark' ? '☀' : '☾'"></span>
+                             :class="$store.theme === 'light' ? 'translate-x-[24px]' : 'translate-x-0'">
+                            <span x-text="$store.theme === 'dark' ? '☀' : '☾'"></span>
                         </div>
                     </button>
                 </div>
