@@ -11,6 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.44.2/dist/apexcharts.min.js"></script>
 </head>
 <body class="font-body antialiased dark"
       x-data="{
@@ -89,10 +91,7 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <div class="flex items-center gap-1.5 px-3.5 py-[7px] rounded-full text-xs font-medium bg-profit/10 text-profit border border-profit/25">
-                        <span class="w-1.5 h-1.5 rounded-full bg-profit shadow-[0_0_0_3px_rgba(32,227,162,0.2)]"></span>
-                        Real Account
-                    </div>
+                    @livewire('account-switcher')
 
                     <button @click="toggle()"
                             class="w-[52px] h-[28px] rounded-full border relative cursor-pointer transition-colors duration-300

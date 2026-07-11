@@ -1,6 +1,8 @@
 <?php
 
 use App\Livewire\Forms\LoginForm;
+use App\Models\Account;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -18,7 +20,26 @@ new #[Layout('layouts.guest')] class extends Component
         $this->form->authenticate();
 
         Session::regenerate();
+
+        $user = Auth::user();
+
+        $account = Account::firstOrCreate(
+            [
+                'user_id' => $user->id,
+                'type' => $this->accountType,
+            ],
+            [
+                'name' => $this->accountType === 'real' ? 'Real Account' : 'Demo Account',
+                'initial_balance' => 0,
+                'current_balance' => 0,
+                'currency' => 'USD',
+                'is_active' => true,
+            ]
+        );
+
+        $user->update(['active_account_id' => $account->id]);
         Session::put('active_account_type', $this->accountType);
+        Session::put('active_account_id', $account->id);
 
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
@@ -33,7 +54,6 @@ new #[Layout('layouts.guest')] class extends Component
     <h2 class="font-display text-[26px] font-semibold tracking-tight mb-1.5">Masuk ke akun kamu</h2>
     <p class="text-sm text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] mb-7">Kelola dan pantau performa trading harianmu</p>
 
-    {{-- Account Type Toggle --}}
     <div class="flex bg-white/[0.04] border border-white/[0.09] rounded-xl p-1 mb-6 gap-1 dark:bg-white/[0.04] dark:border-white/[0.09] light:bg-black/[0.03] light:border-black/[0.08]">
         <button type="button" wire:click="$set('accountType', 'real')"
                 class="flex-1 text-center py-2.5 rounded-[9px] text-[13px] font-medium font-body transition-all duration-200
@@ -52,7 +72,7 @@ new #[Layout('layouts.guest')] class extends Component
     <form wire:submit="login">
         <div class="mb-4">
             <x-input-label for="email" value="Email atau Username" />
-            <x-text-input wire:model="form.email" id="email" type="email" name="email" required autofocus autocomplete="username" placeholder="gia@tradeledger.io" />
+            <x-text-input wire:model="form.email" id="email" type="email" name="email" required autofocus autocomplete="username" placeholder="admin@tradeledger.io" />
             <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
         </div>
 
