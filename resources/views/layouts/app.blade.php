@@ -59,7 +59,7 @@
                         ['label' => 'Daily Log', 'route' => 'daily-log', 'slug' => 'daily-log'],
                         ['label' => 'Target & Rules', 'route' => 'target-rules', 'slug' => 'target-rules'],
                         ['label' => 'Deposit / WD', 'route' => 'deposit-withdrawal', 'slug' => 'deposit-withdrawal'],
-                        ['label' => 'Analytics', 'route' => null, 'slug' => 'analytics'],
+                        ['label' => 'Analytics', 'route' => 'analytics', 'slug' => 'analytics'],
                         ['label' => 'Journal', 'route' => null, 'slug' => 'journal'],
                         ['label' => 'Pengaturan', 'route' => null, 'slug' => 'pengaturan'],
                     ];

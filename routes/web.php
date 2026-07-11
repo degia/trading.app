@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Analytics;
 use App\Livewire\DashboardOverview;
 use App\Livewire\DailyLogTable;
 use App\Livewire\DepositWithdrawal;
@@ -23,6 +24,10 @@ Route::get('target-rules', TargetRules::class)
 Route::get('deposit-withdrawal', DepositWithdrawal::class)
     ->middleware(['auth', 'verified'])
     ->name('deposit-withdrawal');
+
+Route::get('analytics', Analytics::class)
+    ->middleware(['auth', 'verified'])
+    ->name('analytics');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
