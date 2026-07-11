@@ -8,13 +8,15 @@ use App\Models\Target;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+#[Layout('layouts.app')]
 class DashboardOverview extends Component
 {
     public string $selectedMonth = '';
 
-    protected $listeners = ['accountSwitched' => '$refresh'];
+    protected $listeners = ['accountSwitched' => '$refresh', 'refreshDashboard' => '$refresh'];
 
     public function mount(): void
     {
@@ -114,7 +116,14 @@ class DashboardOverview extends Component
         $query = $this->scopedQuery();
         if (! $query) return collect();
 
-        return (clone $query)->orderByDesc('log_date')->get();
+        $account = $this->activeAccount;
+
+        return (clone $query)
+            ->with(['targets' => function ($q) use ($account) {
+                $q->where('account_id', $account->id);
+            }])
+            ->orderByDesc('log_date')
+            ->get();
     }
 
     public function getLatestTargetDateProperty()

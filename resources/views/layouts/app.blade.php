@@ -55,23 +55,29 @@
             <nav class="flex flex-col gap-0.5 flex-1">
                 @php
                     $navItems = [
-                        'Overview', 'Daily Log', 'Target & Rules', 'Deposit / WD', 'Analytics', 'Journal', 'Pengaturan'
+                        ['label' => 'Overview', 'route' => 'dashboard', 'slug' => 'dashboard'],
+                        ['label' => 'Daily Log', 'route' => 'daily-log', 'slug' => 'daily-log'],
+                        ['label' => 'Target & Rules', 'route' => null, 'slug' => 'target'],
+                        ['label' => 'Deposit / WD', 'route' => null, 'slug' => 'deposit'],
+                        ['label' => 'Analytics', 'route' => null, 'slug' => 'analytics'],
+                        ['label' => 'Journal', 'route' => null, 'slug' => 'journal'],
+                        ['label' => 'Pengaturan', 'route' => null, 'slug' => 'pengaturan'],
                     ];
                     $currentRoute = request()->route()->getName() ?? '';
                 @endphp
 
-                @foreach($navItems as $label)
+                @foreach($navItems as $item)
                     @php
-                        $slug = strtolower(str_replace([' ', '&', '/'], ['-', '-', '-'], $label));
-                        $isActive = str_contains($currentRoute, $slug) || ($loop->first && $currentRoute === 'dashboard');
+                        $isActive = $currentRoute === $item['route'] || ($item['slug'] === 'dashboard' && $currentRoute === 'dashboard');
+                        $href = $item['route'] ? route($item['route']) : '#';
                     @endphp
-                    <a href="#" wire:navigate
+                    <a href="{{ $href }}" wire:navigate
                        class="flex items-center gap-2.5 py-2.5 px-3 rounded-[10px] text-[13.5px] transition-all duration-200
                        {{ $isActive
                            ? 'bg-white/[0.06] dark:text-white text-black'
                            : 'dark:text-[#8b8b93] text-[#6b6b70] dark:hover:text-white hover:text-black' }}">
                         <span class="w-1.5 h-1.5 rounded-full shrink-0 {{ $isActive ? 'bg-profit' : 'bg-current opacity-50' }}"></span>
-                        {{ $label }}
+                        {{ $item['label'] }}
                     </a>
                 @endforeach
             </nav>
@@ -128,16 +134,16 @@
                     <span class="font-display font-semibold text-[19px] tracking-tight text-white">TradeLedger</span>
                 </div>
                 <nav class="flex flex-col gap-0.5 flex-1">
-                    @foreach($navItems as $label)
+                    @foreach($navItems as $item)
                         @php
-                            $slug = strtolower(str_replace([' ', '&', '/'], ['-', '-', '-'], $label));
-                            $isActive = str_contains($currentRoute, $slug) || ($loop->first && $currentRoute === 'dashboard');
+                            $isActive = $currentRoute === $item['route'] || ($item['slug'] === 'dashboard' && $currentRoute === 'dashboard');
+                            $href = $item['route'] ? route($item['route']) : '#';
                         @endphp
-                        <a href="#" wire:navigate @click="mobileNav = false"
+                        <a href="{{ $href }}" wire:navigate @click="mobileNav = false"
                            class="flex items-center gap-2.5 py-2.5 px-3 rounded-[10px] text-[13.5px] transition-all duration-200
                            {{ $isActive ? 'bg-white/[0.06] text-white' : 'text-[#8b8b93] hover:text-white' }}">
                             <span class="w-1.5 h-1.5 rounded-full shrink-0 {{ $isActive ? 'bg-profit' : 'bg-current opacity-50' }}"></span>
-                            {{ $label }}
+                            {{ $item['label'] }}
                         </a>
                     @endforeach
                 </nav>

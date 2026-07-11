@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Account extends Model
 {
@@ -33,6 +34,20 @@ class Account extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function rules(): HasOne
+    {
+        return $this->hasOne(AccountRule::class);
+    }
+
+    public function getOrCreateRules(): AccountRule
+    {
+        return $this->rules()->firstOrCreate(['account_id' => $this->id], [
+            'target_1_pct' => 5.00,
+            'target_2_pct' => 10.00,
+            'off_days' => ['saturday', 'sunday'],
+        ]);
     }
 
     public function dailyLogs(): HasMany

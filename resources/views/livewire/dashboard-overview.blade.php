@@ -177,8 +177,10 @@
                 <tbody>
                     @forelse($this->dailyLogs as $log)
                         @php
-                            $runningFive = $log->balance * 0.05;
-                            $runningTen = $log->balance * 0.10;
+                            $target5 = $log->targets->firstWhere('target_type', '5pct');
+                            $target10 = $log->targets->firstWhere('target_type', '10pct');
+                            $running5 = $target5 ? (float) $target5->running_amount : 0;
+                            $running10 = $target10 ? (float) $target10->running_amount : 0;
                         @endphp
                         <tr class="border-b dark:border-white/[0.04] border-black/[0.04] dark:hover:bg-white/[0.02] hover:bg-black/[0.015] transition-colors">
                             <td class="py-3 px-5">
@@ -193,17 +195,21 @@
                             <td class="py-3 px-5 text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] text-[12px]">{{ $log->day_name }}</td>
                             <td class="py-3 px-5 font-mono text-[12px]">{{ $log->log_date->format('d/m/Y') }}</td>
                             <td class="py-3 px-5 font-mono font-medium">${{ number_format($log->balance, 2) }}</td>
-                            <td class="py-3 px-5 font-mono text-[12px] {{ $log->status !== 'day_off' ? 'num-target' : '' }}">
-                                @if($log->status !== 'day_off')${{ number_format($runningFive, 2) }}@else$0.00@endif
+                            <td class="py-3 px-5 font-mono text-[12px] {{ $running5 >= 0 ? 'num-target' : 'num-neg' }}">
+                                @if($log->status !== 'day_off')${{ number_format($running5, 2) }}@else$0.00
+                                @endif
                             </td>
-                            <td class="py-3 px-5 font-mono text-[12px] num-neg">
-                                @if($log->status !== 'day_off')${{ number_format($runningTen, 2) }}@else${{ number_format($log->balance * 0.10, 2) }}@endif
+                            <td class="py-3 px-5 font-mono text-[12px] {{ $running10 >= 0 ? 'num-pos' : 'num-neg' }}">
+                                @if($log->status !== 'day_off')${{ number_format($running10, 2) }}@else$0.00
+                                @endif
                             </td>
                             <td class="py-3 px-5 font-mono text-[12px] num-pos">
-                                @if($log->profit_amount > 0)${{ number_format($log->profit_amount, 2) }}@else$0.00@endif
+                                @if($log->profit_amount > 0)${{ number_format($log->profit_amount, 2) }}@else$0.00
+                                @endif
                             </td>
                             <td class="py-3 px-5 font-mono text-[12px] num-neg">
-                                @if($log->loss_amount > 0)${{ number_format($log->loss_amount, 2) }}@else$0.00@endif
+                                @if($log->loss_amount > 0)${{ number_format($log->loss_amount, 2) }}@else$0.00
+                                @endif
                             </td>
                         </tr>
                     @empty
