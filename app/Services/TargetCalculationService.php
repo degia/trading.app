@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Account;
+use App\Models\AccountRule;
 use App\Models\DailyLog;
 use App\Models\Scopes\ActiveAccountScope;
 use App\Models\Target;
@@ -10,8 +11,15 @@ use Illuminate\Support\Facades\DB;
 
 class TargetCalculationService
 {
+    private function getRules(Account $account): AccountRule
+    {
+        return $account->getOrCreateRules();
+    }
+
     public function calculateForNewEntry(Account $account, DailyLog $log): void
     {
+        $rules = $this->getRules($account);
+
         $prevLog = DailyLog::withoutGlobalScope(ActiveAccountScope::class)
             ->where('account_id', $account->id)
             ->where('log_date', '<', $log->log_date)
@@ -20,8 +28,8 @@ class TargetCalculationService
 
         $prevRunning5 = 0;
         $prevRunning10 = 0;
-        $target5Amount = $account->initial_balance * 0.05;
-        $target10Amount = $account->initial_balance * 0.10;
+        $target5Amount = $rules->getTarget1Amount((float) $account->initial_balance);
+        $target10Amount = $rules->getTarget2Amount((float) $account->initial_balance);
 
         if ($prevLog && $prevLog->status !== 'day_off') {
             $prevTargets = Target::withoutGlobalScope(ActiveAccountScope::class)
@@ -30,21 +38,21 @@ class TargetCalculationService
                 ->get()
                 ->keyBy('target_type');
 
-            $prevRunning5 = (float) ($prevTargets->get('5pct')?->running_amount ?? 0);
-            $prevRunning10 = (float) ($prevTargets->get('10pct')?->running_amount ?? 0);
-            $target5Amount = (float) ($prevTargets->get('5pct')?->target_amount ?? $target5Amount);
-            $target10Amount = (float) ($prevTargets->get('10pct')?->target_amount ?? $target10Amount);
+            $prevRunning5 = (float) ($prevTargets->get('target_1')?->running_amount ?? 0);
+            $prevRunning10 = (float) ($prevTargets->get('target_2')?->running_amount ?? 0);
+            $target5Amount = (float) ($prevTargets->get('target_1')?->target_amount ?? $target5Amount);
+            $target10Amount = (float) ($prevTargets->get('target_2')?->target_amount ?? $target10Amount);
         } elseif ($prevLog && $prevLog->status === 'day_off') {
-            $target5Amount = (float) $prevLog->balance * 0.05;
-            $target10Amount = (float) $prevLog->balance * 0.10;
+            $target5Amount = $rules->getTarget1Amount((float) $prevLog->balance);
+            $target10Amount = $rules->getTarget2Amount((float) $prevLog->balance);
         }
 
         if ($log->status === 'day_off') {
             $newBalance = $prevLog ? (float) $prevLog->balance : (float) $account->current_balance;
             $running5 = 0;
             $running10 = 0;
-            $target5Amount = $newBalance * 0.05;
-            $target10Amount = $newBalance * 0.10;
+            $target5Amount = $rules->getTarget1Amount($newBalance);
+            $target10Amount = $rules->getTarget2Amount($newBalance);
             $dailyPct = 0;
         } elseif ($log->status === 'profit') {
             $profitAmt = (float) $log->profit_amount;
@@ -77,7 +85,7 @@ class TargetCalculationService
             Target::create([
                 'account_id' => $account->id,
                 'daily_log_id' => $log->id,
-                'target_type' => '5pct',
+                'target_type' => 'target_1',
                 'target_amount' => $target5Amount,
                 'running_amount' => round($running5, 2),
                 'target_closing' => $closing5,
@@ -87,7 +95,7 @@ class TargetCalculationService
             Target::create([
                 'account_id' => $account->id,
                 'daily_log_id' => $log->id,
-                'target_type' => '10pct',
+                'target_type' => 'target_2',
                 'target_amount' => $target10Amount,
                 'running_amount' => round($running10, 2),
                 'target_closing' => $closing10,
@@ -102,6 +110,8 @@ class TargetCalculationService
 
     public function recalculateForward(Account $account, DailyLog $afterLog): void
     {
+        $rules = $this->getRules($account);
+
         $futureLogs = DailyLog::withoutGlobalScope(ActiveAccountScope::class)
             ->where('account_id', $account->id)
             ->where('log_date', '>', $afterLog->log_date)
@@ -115,10 +125,10 @@ class TargetCalculationService
             ->get()
             ->keyBy('target_type');
 
-        $running5 = (float) ($prevTargets->get('5pct')?->running_amount ?? 0);
-        $running10 = (float) ($prevTargets->get('10pct')?->running_amount ?? 0);
-        $target5Amount = (float) ($prevTargets->get('5pct')?->target_amount ?? $account->initial_balance * 0.05);
-        $target10Amount = (float) ($prevTargets->get('10pct')?->target_amount ?? $account->initial_balance * 0.10);
+        $running5 = (float) ($prevTargets->get('target_1')?->running_amount ?? 0);
+        $running10 = (float) ($prevTargets->get('target_2')?->running_amount ?? 0);
+        $target5Amount = (float) ($prevTargets->get('target_1')?->target_amount ?? $rules->getTarget1Amount((float) $account->initial_balance));
+        $target10Amount = (float) ($prevTargets->get('target_2')?->target_amount ?? $rules->getTarget2Amount((float) $account->initial_balance));
         $lastBalance = (float) $afterLog->balance;
 
         foreach ($futureLogs as $log) {
@@ -126,8 +136,8 @@ class TargetCalculationService
                 $newBalance = $lastBalance;
                 $running5 = 0;
                 $running10 = 0;
-                $target5Amount = $newBalance * 0.05;
-                $target10Amount = $newBalance * 0.10;
+                $target5Amount = $rules->getTarget1Amount($newBalance);
+                $target10Amount = $rules->getTarget2Amount($newBalance);
                 $dailyPct = 0;
             } elseif ($log->status === 'profit') {
                 $profitAmt = (float) $log->profit_amount;
@@ -160,7 +170,7 @@ class TargetCalculationService
                 Target::create([
                     'account_id' => $account->id,
                     'daily_log_id' => $log->id,
-                    'target_type' => '5pct',
+                    'target_type' => 'target_1',
                     'target_amount' => $target5Amount,
                     'running_amount' => round($running5, 2),
                     'target_closing' => $closing5,
@@ -170,7 +180,7 @@ class TargetCalculationService
                 Target::create([
                     'account_id' => $account->id,
                     'daily_log_id' => $log->id,
-                    'target_type' => '10pct',
+                    'target_type' => 'target_2',
                     'target_amount' => $target10Amount,
                     'running_amount' => round($running10, 2),
                     'target_closing' => $closing10,
@@ -186,6 +196,8 @@ class TargetCalculationService
 
     public function recalculateAllForAccount(Account $account): void
     {
+        $rules = $this->getRules($account);
+
         $firstLog = DailyLog::withoutGlobalScope(ActiveAccountScope::class)
             ->where('account_id', $account->id)
             ->orderBy('log_date')
@@ -200,8 +212,8 @@ class TargetCalculationService
         $balance = (float) $account->initial_balance;
         $running5 = 0;
         $running10 = 0;
-        $target5Amount = $balance * 0.05;
-        $target10Amount = $balance * 0.10;
+        $target5Amount = $rules->getTarget1Amount($balance);
+        $target10Amount = $rules->getTarget2Amount($balance);
 
         $logs = DailyLog::withoutGlobalScope(ActiveAccountScope::class)
             ->where('account_id', $account->id)
@@ -212,8 +224,8 @@ class TargetCalculationService
             if ($log->status === 'day_off') {
                 $running5 = 0;
                 $running10 = 0;
-                $target5Amount = $balance * 0.05;
-                $target10Amount = $balance * 0.10;
+                $target5Amount = $rules->getTarget1Amount($balance);
+                $target10Amount = $rules->getTarget2Amount($balance);
                 $dailyPct = 0;
             } elseif ($log->status === 'profit') {
                 $profitAmt = (float) $log->profit_amount;
@@ -243,7 +255,7 @@ class TargetCalculationService
                 Target::create([
                     'account_id' => $account->id,
                     'daily_log_id' => $log->id,
-                    'target_type' => '5pct',
+                    'target_type' => 'target_1',
                     'target_amount' => $target5Amount,
                     'running_amount' => round($running5, 2),
                     'target_closing' => $closing5,
@@ -253,7 +265,7 @@ class TargetCalculationService
                 Target::create([
                     'account_id' => $account->id,
                     'daily_log_id' => $log->id,
-                    'target_type' => '10pct',
+                    'target_type' => 'target_2',
                     'target_amount' => $target10Amount,
                     'running_amount' => round($running10, 2),
                     'target_closing' => $closing10,

@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('account_id')->constrained()->cascadeOnDelete();
             $table->decimal('target_1_pct', 5, 2)->default(5.00);
             $table->decimal('target_2_pct', 5, 2)->default(10.00);
-            $table->json('off_days')->default('["saturday","sunday"]');
+            $table->json('off_days');
             $table->timestamps();
 
             $table->unique('account_id');

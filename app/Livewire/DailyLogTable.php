@@ -36,7 +36,10 @@ class DailyLogTable extends Component
     public bool $showDeleteConfirm = false;
     public ?int $deletingId = null;
 
-    protected $listeners = ['accountSwitched' => '$refresh'];
+    public array $selectedIds = [];
+    public bool $showBulkConfirm = false;
+
+    protected $listeners = ['accountSwitched' => '$refresh', 'refreshDashboard' => '$refresh'];
 
     public function mount(): void
     {
@@ -49,6 +52,14 @@ class DailyLogTable extends Component
 
         return Auth::user()->accounts()->where('id', $accountId)->first()
             ?? Auth::user()->accounts()->first();
+    }
+
+    public function getRulesProperty()
+    {
+        $account = $this->activeAccount;
+        if (! $account) return null;
+
+        return $account->getOrCreateRules();
     }
 
     public function getMonthOptionsProperty(): array
@@ -232,6 +243,87 @@ class DailyLogTable extends Component
 
         $this->showDeleteConfirm = false;
         $this->deletingId = null;
+        $this->dispatch('refreshDashboard');
+    }
+
+    public function getIsAllSelectedProperty(): bool
+    {
+        $pageIds = $this->logs->pluck('id')->toArray();
+
+        return count($pageIds) > 0 && count(array_intersect($pageIds, $this->selectedIds)) === count($pageIds);
+    }
+
+    public function toggleAll(): void
+    {
+        $pageIds = $this->logs->pluck('id')->toArray();
+
+        if ($this->isAllSelected) {
+            $this->selectedIds = array_values(array_diff($this->selectedIds, $pageIds));
+        } else {
+            $this->selectedIds = array_unique(array_merge($this->selectedIds, $pageIds));
+        }
+    }
+
+    public function toggleSelect(int $id): void
+    {
+        if (in_array($id, $this->selectedIds)) {
+            $this->selectedIds = array_values(array_diff($this->selectedIds, [$id]));
+        } else {
+            $this->selectedIds[] = $id;
+        }
+    }
+
+    public function confirmBulkDelete(): void
+    {
+        if (empty($this->selectedIds)) return;
+        $this->showBulkConfirm = true;
+    }
+
+    public function cancelBulkDelete(): void
+    {
+        $this->showBulkConfirm = false;
+    }
+
+    public function bulkDelete(): void
+    {
+        if (empty($this->selectedIds)) return;
+
+        $account = $this->activeAccount;
+        if (! $account) return;
+
+        $logs = DailyLog::withoutGlobalScope(ActiveAccountScope::class)
+            ->where('account_id', $account->id)
+            ->whereIn('id', $this->selectedIds)
+            ->orderBy('log_date')
+            ->get();
+
+        if ($logs->isEmpty()) {
+            $this->selectedIds = [];
+            $this->showBulkConfirm = false;
+            return;
+        }
+
+        $earliestDate = $logs->first()->log_date;
+
+        DailyLog::withoutGlobalScope(ActiveAccountScope::class)
+            ->where('account_id', $account->id)
+            ->whereIn('id', $this->selectedIds)
+            ->delete();
+
+        $prevLog = DailyLog::withoutGlobalScope(ActiveAccountScope::class)
+            ->where('account_id', $account->id)
+            ->where('log_date', '<', $earliestDate)
+            ->orderByDesc('log_date')
+            ->first();
+
+        if ($prevLog) {
+            app(TargetCalculationService::class)->recalculateForward($account, $prevLog);
+        } else {
+            app(TargetCalculationService::class)->recalculateAllForAccount($account);
+        }
+
+        $this->selectedIds = [];
+        $this->showBulkConfirm = false;
         $this->dispatch('refreshDashboard');
     }
 

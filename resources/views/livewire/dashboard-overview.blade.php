@@ -122,7 +122,7 @@
                             {{ number_format($this->targetProgress['five_pct'], 0) }}%
                         </text>
                     </svg>
-                    <div class="text-[11px] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] mt-2 uppercase tracking-[0.04em]">Target 5%</div>
+                    <div class="text-[11px] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] mt-2 uppercase tracking-[0.04em]">Target {{ $this->rules->target_1_pct }}%</div>
                     <div class="font-mono text-[13px] font-semibold mt-0.5 num-target">${{ number_format($this->targetProgress['five_amount'], 2) }}</div>
                 </div>
                 <div class="ring-item text-center">
@@ -136,7 +136,7 @@
                             {{ number_format($this->targetProgress['ten_pct'], 0) }}%
                         </text>
                     </svg>
-                    <div class="text-[11px] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] mt-2 uppercase tracking-[0.04em]">Target 10%</div>
+                    <div class="text-[11px] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] mt-2 uppercase tracking-[0.04em]">Target {{ $this->rules->target_2_pct }}%</div>
                     <div class="font-mono text-[13px] font-semibold mt-0.5 num-neg">${{ number_format($this->targetProgress['ten_amount'], 2) }}</div>
                 </div>
             </div>
@@ -168,8 +168,8 @@
                         <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Day</th>
                         <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Tanggal</th>
                         <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Balance</th>
-                        <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Running 5%</th>
-                        <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Running 10%</th>
+                        <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Running {{ $this->rules->target_1_pct }}%</th>
+                        <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Running {{ $this->rules->target_2_pct }}%</th>
                         <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Profit</th>
                         <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Loss</th>
                     </tr>
@@ -177,8 +177,8 @@
                 <tbody>
                     @forelse($this->dailyLogs as $log)
                         @php
-                            $target5 = $log->targets->firstWhere('target_type', '5pct');
-                            $target10 = $log->targets->firstWhere('target_type', '10pct');
+                            $target5 = $log->targets->firstWhere('target_type', 'target_1');
+                            $target10 = $log->targets->firstWhere('target_type', 'target_2');
                             $running5 = $target5 ? (float) $target5->running_amount : 0;
                             $running10 = $target10 ? (float) $target10->running_amount : 0;
                         @endphp

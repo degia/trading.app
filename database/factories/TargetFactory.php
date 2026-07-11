@@ -12,7 +12,7 @@ class TargetFactory extends Factory
 
     public function definition(): array
     {
-        $targetType = fake()->randomElement(['5pct', '10pct']);
+        $targetType = fake()->randomElement(['target_1', 'target_2']);
         $targetAmount = fake()->randomFloat(2, 3, 20);
 
         return [

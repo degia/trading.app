@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\DailyLog;
 use App\Models\Scopes\ActiveAccountScope;
 use App\Models\Target;
+use App\Services\TargetCalculationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -34,6 +35,14 @@ class DashboardOverview extends Component
 
         return Auth::user()->accounts()->where('id', $accountId)->first()
             ?? Auth::user()->accounts()->first();
+    }
+
+    public function getRulesProperty()
+    {
+        $account = $this->activeAccount;
+        if (! $account) return null;
+
+        return $account->getOrCreateRules();
     }
 
     public function getMonthOptionsProperty(): array
@@ -162,8 +171,8 @@ class DashboardOverview extends Component
             ->get()
             ->keyBy('target_type');
 
-        $five = $targets->get('5pct');
-        $ten = $targets->get('10pct');
+        $five = $targets->get('target_1');
+        $ten = $targets->get('target_2');
 
         return [
             'five_pct' => $five ? min(((float) $five->running_amount / (float) $five->target_amount) * 100, 100) : 0,
