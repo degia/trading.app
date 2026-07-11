@@ -30,11 +30,26 @@
         </button>
     </div>
 
+    {{-- Bulk delete bar --}}
+    @if(count($selectedIds) > 0)
+        <div class="flex items-center justify-between px-4 py-2.5 rounded-[10px] bg-loss/8 border border-loss/15">
+            <span class="text-[12px] font-medium text-loss">{{ count($selectedIds) }} entri dipilih</span>
+            <button wire:click="confirmBulkDelete"
+                    class="px-3.5 py-1.5 rounded-lg text-[11px] font-semibold bg-loss text-white hover:opacity-80 transition-opacity">
+                Hapus Terpilih
+            </button>
+        </div>
+    @endif
+
     <div class="glass-card overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full border-collapse text-[13px] min-w-[700px]">
                 <thead>
                     <tr>
+                        <th class="py-2.5 px-3 border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium w-[40px]">
+                            <input type="checkbox" wire:click="toggleAll" @checked($this->isAllSelected)
+                                   class="w-3.5 h-3.5 rounded border-white/20 dark:bg-white/[0.06] bg-black/[0.06] text-profit focus:ring-profit/30 cursor-pointer">
+                        </th>
                         <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Status</th>
                         <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Day</th>
                         <th class="text-left py-2.5 px-5 text-[10.5px] uppercase tracking-[0.06em] text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] border-t border-b dark:border-white/[0.09] border-black/[0.08] font-medium">Tanggal</th>
@@ -55,6 +70,10 @@
                             $running10 = $target10 ? (float) $target10->running_amount : 0;
                         @endphp
                         <tr class="border-b dark:border-white/[0.04] border-black/[0.04] dark:hover:bg-white/[0.02] hover:bg-black/[0.015] transition-colors">
+                            <td class="py-3 px-3">
+                                <input type="checkbox" wire:click="toggleSelect({{ $log->id }})" @checked(in_array($log->id, $selectedIds))
+                                       class="w-3.5 h-3.5 rounded border-white/20 dark:bg-white/[0.06] bg-black/[0.06] text-profit focus:ring-profit/30 cursor-pointer">
+                            </td>
                             <td class="py-3 px-5">
                                 @if($log->status === 'profit')
                                     <span class="status-chip px-2.5 py-1 rounded-full text-[10.5px] font-medium bg-profit/10 text-profit">Profit</span>
@@ -102,7 +121,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="py-12 px-5 text-center text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] font-body">
+                            <td colspan="10" class="py-12 px-5 text-center text-[#8b8b93] dark:text-[#8b8b93] text-[#6b6b70] font-body">
                                 Belum ada data trading untuk bulan ini.
                             </td>
                         </tr>
@@ -237,6 +256,31 @@
                     <button wire:click="deleteEntry"
                             class="flex-1 py-2.5 rounded-[10px] text-[13px] font-medium border-0 transition-all bg-loss text-white hover:opacity-80">
                         Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Bulk Delete Confirmation --}}
+    @if($showBulkConfirm)
+        <div class="fixed inset-0 z-[100] flex items-center justify-center p-4" x-data>
+            <div class="fixed inset-0 bg-black/60" wire:click="cancelBulkDelete"></div>
+            <div class="relative w-full max-w-sm rounded-[20px] border p-6 z-10
+                dark:bg-ink-2 dark:border-white/[0.09] bg-white border-black/[0.08] shadow-2xl">
+                <h3 class="font-display text-lg font-semibold mb-2">Hapus {{ count($selectedIds) }} Entri?</h3>
+                <p class="text-sm dark:text-[#8b8b93] text-[#6b6b70] mb-5">
+                    Semua data trading yang dipilih akan dihapus permanen. Running balance dan target akan dihitung ulang otomatis.
+                </p>
+                <div class="flex gap-2">
+                    <button wire:click="cancelBulkDelete"
+                            class="flex-1 py-2.5 rounded-[10px] text-[13px] font-medium border transition-all
+                            dark:border-white/[0.09] dark:text-[#8b8b93] dark:hover:text-white border-black/[0.08] text-[#6b6b70] hover:text-ink">
+                        Batal
+                    </button>
+                    <button wire:click="bulkDelete"
+                            class="flex-1 py-2.5 rounded-[10px] text-[13px] font-medium border-0 transition-all bg-loss text-white hover:opacity-80">
+                        Hapus Semua
                     </button>
                 </div>
             </div>
