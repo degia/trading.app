@@ -4,6 +4,7 @@ use App\Livewire\Analytics;
 use App\Livewire\DashboardOverview;
 use App\Livewire\DailyLogTable;
 use App\Livewire\DepositWithdrawal;
+use App\Livewire\Journal;
 use App\Livewire\TargetRules;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,10 @@ Route::get('deposit-withdrawal', DepositWithdrawal::class)
 Route::get('analytics', Analytics::class)
     ->middleware(['auth', 'verified'])
     ->name('analytics');
+
+Route::get('journal', Journal::class)
+    ->middleware(['auth', 'verified'])
+    ->name('journal');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])

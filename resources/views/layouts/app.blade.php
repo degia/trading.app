@@ -60,7 +60,7 @@
                         ['label' => 'Target & Rules', 'route' => 'target-rules', 'slug' => 'target-rules'],
                         ['label' => 'Deposit / WD', 'route' => 'deposit-withdrawal', 'slug' => 'deposit-withdrawal'],
                         ['label' => 'Analytics', 'route' => 'analytics', 'slug' => 'analytics'],
-                        ['label' => 'Journal', 'route' => null, 'slug' => 'journal'],
+                        ['label' => 'Journal', 'route' => 'journal', 'slug' => 'journal'],
                         ['label' => 'Pengaturan', 'route' => null, 'slug' => 'pengaturan'],
                     ];
                     $currentRoute = request()->route()->getName() ?? '';
