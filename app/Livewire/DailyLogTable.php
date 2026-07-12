@@ -4,7 +4,6 @@ namespace App\Livewire;
 
 use App\Models\DailyLog;
 use App\Models\Scopes\ActiveAccountScope;
-use App\Models\Target;
 use App\Services\TargetCalculationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -227,19 +226,9 @@ class DailyLogTable extends Component
             ->where('account_id', $account->id)
             ->findOrFail($this->deletingId);
 
-        $prevLog = DailyLog::withoutGlobalScope(ActiveAccountScope::class)
-            ->where('account_id', $account->id)
-            ->where('log_date', '<', $log->log_date)
-            ->orderByDesc('log_date')
-            ->first();
-
         $log->delete();
 
-        if ($prevLog) {
-            app(TargetCalculationService::class)->recalculateForward($account, $prevLog);
-        } else {
-            app(TargetCalculationService::class)->recalculateAllForAccount($account);
-        }
+        app(TargetCalculationService::class)->recalculateAllForAccount($account);
 
         $this->showDeleteConfirm = false;
         $this->deletingId = null;
@@ -303,24 +292,12 @@ class DailyLogTable extends Component
             return;
         }
 
-        $earliestDate = $logs->first()->log_date;
-
         DailyLog::withoutGlobalScope(ActiveAccountScope::class)
             ->where('account_id', $account->id)
             ->whereIn('id', $this->selectedIds)
             ->delete();
 
-        $prevLog = DailyLog::withoutGlobalScope(ActiveAccountScope::class)
-            ->where('account_id', $account->id)
-            ->where('log_date', '<', $earliestDate)
-            ->orderByDesc('log_date')
-            ->first();
-
-        if ($prevLog) {
-            app(TargetCalculationService::class)->recalculateForward($account, $prevLog);
-        } else {
-            app(TargetCalculationService::class)->recalculateAllForAccount($account);
-        }
+        app(TargetCalculationService::class)->recalculateAllForAccount($account);
 
         $this->selectedIds = [];
         $this->showBulkConfirm = false;

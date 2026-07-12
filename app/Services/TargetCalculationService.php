@@ -106,7 +106,7 @@ class TargetCalculationService
 
         $account->update(['current_balance' => round($newBalance, 2)]);
 
-        $this->recalculateForward($account, $log);
+        $this->recalculateAllForAccount($account);
     }
 
     public function recalculateForward(Account $account, DailyLog $afterLog): void
@@ -199,13 +199,6 @@ class TargetCalculationService
     {
         $rules = $this->getRules($account);
 
-        $firstLog = DailyLog::withoutGlobalScope(ActiveAccountScope::class)
-            ->where('account_id', $account->id)
-            ->orderBy('log_date')
-            ->first();
-
-        if (! $firstLog) return;
-
         Target::withoutGlobalScope(ActiveAccountScope::class)
             ->where('account_id', $account->id)
             ->delete();
@@ -223,11 +216,22 @@ class TargetCalculationService
             ->orderBy('log_date')
             ->get();
 
-        $firstLogDate = $logs->first()?->log_date?->format('Y-m-d');
+        if ($logs->isEmpty()) {
+            foreach ($transactionsByDate as $txns) {
+                foreach ($txns as $txn) {
+                    $balance = $this->applyTransactionToBalance($balance, $txn);
+                }
+            }
+
+            $account->update(['current_balance' => round($balance, 2)]);
+            return;
+        }
+
+        $firstLogDate = $logs->first()->log_date->format('Y-m-d');
         $lastLogDate = null;
 
         foreach ($transactionsByDate as $dateKey => $txns) {
-            if ($firstLogDate && $dateKey < $firstLogDate) {
+            if ($dateKey < $firstLogDate) {
                 foreach ($txns as $txn) {
                     $balance = $this->applyTransactionToBalance($balance, $txn);
                 }

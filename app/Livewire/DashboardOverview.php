@@ -170,8 +170,8 @@ class DashboardOverview extends Component
         $ten = $targets->get('target_2');
 
         return [
-            'five_pct' => $five ? min(((float) $five->running_amount / (float) $five->target_amount) * 100, 100) : 0,
-            'ten_pct' => $ten ? min(((float) $ten->running_amount / (float) $ten->target_amount) * 100, 100) : 0,
+            'five_pct' => $five && (float) $five->target_amount > 0 ? min(((float) $five->running_amount / (float) $five->target_amount) * 100, 100) : 0,
+            'ten_pct' => $ten && (float) $ten->target_amount > 0 ? min(((float) $ten->running_amount / (float) $ten->target_amount) * 100, 100) : 0,
             'five_amount' => $five ? (float) $five->target_amount : 0,
             'ten_amount' => $ten ? (float) $ten->target_amount : 0,
             'five_running' => $five ? (float) $five->running_amount : 0,
