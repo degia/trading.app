@@ -110,6 +110,16 @@
             </nav>
 
             <div class="pt-5 mt-5 border-t dark:border-white/[0.09] border-black/[0.08]">
+                <form action="{{ route('logout') }}" method="POST" class="mb-4">
+                    @csrf
+                    <button type="submit"
+                        class="flex items-center gap-2.5 py-2.5 px-3 rounded-[10px] text-[13.5px] w-full transition-all duration-200 dark:text-[#8b8b93] text-[#6b6b70] hover:text-loss dark:hover:text-loss">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        Logout
+                    </button>
+                </form>
                 <img src="{{ asset('img/logo-footer.png') }}" alt="TradeLedger"
                     class="w-full max-w-[140px] mx-auto object-contain opacity-60 dark:opacity-50">
             </div>
@@ -148,6 +158,17 @@
                             <span x-text="$store.theme === 'dark' ? '☀' : '☾'"></span>
                         </div>
                     </button>
+
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit"
+                            class="p-2 rounded-lg dark:hover:bg-white/5 hover:bg-black/5 transition-colors dark:text-[#8b8b93] text-[#6b6b70] hover:text-loss dark:hover:text-loss"
+                            title="Logout">
+                            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </button>
+                    </form>
                 </div>
             </header>
 
@@ -190,6 +211,19 @@
                         </a>
                     @endforeach
                 </nav>
+
+                <div class="pt-5 mt-5 border-t dark:border-white/[0.09] border-black/[0.08]">
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit"
+                            class="flex items-center gap-2.5 py-2.5 px-3 rounded-[10px] text-[13.5px] w-full transition-all duration-200 dark:text-[#8b8b93] text-[#6b6b70] hover:text-loss dark:hover:text-loss">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                            Logout
+                        </button>
+                    </form>
+                </div>
             </div>
 
             {{-- Page content --}}

@@ -1,4 +1,4 @@
-<div x-data="{ open: false }" @click.away="open = false" @keydown.escape.window="open = false">
+<div x-data="{ open: false }" @click.away="open = false" @keydown.escape.window="open = false" class="relative">
     <button @click="open = !open"
             class="flex items-center gap-1.5 px-3.5 py-[7px] rounded-full text-xs font-medium border transition-all duration-200
             {{ $this->activeType === 'real'

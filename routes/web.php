@@ -6,7 +6,9 @@ use App\Livewire\DailyLogTable;
 use App\Livewire\DepositWithdrawal;
 use App\Livewire\Journal;
 use App\Livewire\TargetRules;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 
 Route::view('/', 'welcome');
 
@@ -37,5 +39,12 @@ Route::get('journal', Journal::class)
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
+
+Route::post('logout', function () {
+    Auth::guard('web')->logout();
+    Session::invalidate();
+    Session::regenerateToken();
+    return redirect('/');
+})->middleware('auth')->name('logout');
 
 require __DIR__.'/auth.php';
