@@ -72,6 +72,8 @@
             ['label' => 'Journal', 'route' => 'journal', 'slug' => 'journal', 'icon' => 'journal'],
         ];
         $currentRoute = request()->route()->getName() ?? '';
+        $currentPage = collect($navItems)->firstWhere('route', $currentRoute);
+        $pageTitle = $pageTitle ?? ($currentPage['label'] ?? 'Dashboard');
     @endphp
 
     <div class="flex min-h-screen relative z-10">
@@ -82,9 +84,9 @@
             dark:border-white/[0.09] dark:bg-white/[0.025]
             border-black/[0.08] bg-white/50">
             <div class="flex items-center gap-2.5 mb-9 pl-1">
-                <img src="{{ asset('img/logo-icon.png') }}" alt="TradeLedger"
+                <img src="{{ asset('img/logo-icon.png') }}" alt="TradeVizta"
                     class="w-9 h-9 rounded-[10px] object-contain">
-                <span class="font-display font-semibold text-[19px] tracking-tight">TradeLedger</span>
+                <span class="font-display font-semibold text-[19px] tracking-tight">TradeVizta</span>
             </div>
 
             <nav class="flex flex-col gap-0.5 flex-1">
@@ -129,7 +131,7 @@
                     <img src="{{ asset('img/logo-icon.png') }}" alt="TradeLedger"
                         class="w-7 h-7 rounded-lg object-contain">
                     <h1 class="font-display text-lg sm:text-xl font-semibold tracking-tight">
-                        {{ $pageTitle ?? 'Dashboard' }}
+                        {{ $pageTitle }}
                     </h1>
                 </div>
 
