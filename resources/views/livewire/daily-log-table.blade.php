@@ -21,14 +21,85 @@
             </select>
         </div>
 
+        <div class="flex items-center gap-1" x-data="{
+            calcA: '',
+            calcB: '',
+            calcOp: '+',
+            calcResult: '',
+            calcRun() {
+                const a = parseFloat(this.calcA), b = parseFloat(this.calcB);
+                if (isNaN(a) || isNaN(b)) { this.calcResult = '—'; return; }
+                let r;
+                switch (this.calcOp) {
+                    case '+': r = a + b; break;
+                    case '-': r = a - b; break;
+                    case 'x': r = a * b; break;
+                    case '/': r = b === 0 ? 'Error' : a / b; break;
+                }
+                this.calcResult = r === 'Error' ? 'Error' : parseFloat(r.toFixed(10)).toString();
+            },
+            useResult() {
+                if (!this.calcResult || this.calcResult === 'Error' || this.calcResult === '—') return;
+                $wire.set('formProfitAmount', parseFloat(this.calcResult) || 0);
+                $wire.set('formLossAmount', parseFloat(this.calcResult) || 0);
+            }
+        }" @keydown.enter="calcRun()">
+            <input type="number" step="any" x-model="calcA" placeholder="0"
+                   class="w-14 px-1.5 py-1.5 rounded-lg text-[11px] font-mono border text-center outline-none transition-colors
+                   dark:bg-white/[0.04] dark:border-white/[0.09] dark:text-[#f5f5f4] focus:border-profit/50
+                   bg-black/[0.03] border-black/[0.08] text-[#0a0a0c]">
+
+            <select x-model="calcOp"
+                    class="w-8 px-0.5 py-1.5 rounded-lg text-[11px] font-mono border text-center outline-none cursor-pointer transition-colors
+                    dark:bg-white/[0.04] dark:border-white/[0.09] dark:text-profit
+                    bg-black/[0.03] border-black/[0.08] text-profit">
+                <option value="+">+</option>
+                <option value="-">−</option>
+                <option value="x">×</option>
+                <option value="/">÷</option>
+            </select>
+
+            <input type="number" step="any" x-model="calcB" placeholder="0"
+                   class="w-14 px-1.5 py-1.5 rounded-lg text-[11px] font-mono border text-center outline-none transition-colors
+                   dark:bg-white/[0.04] dark:border-white/[0.09] dark:text-[#f5f5f4] focus:border-profit/50
+                   bg-black/[0.03] border-black/[0.08] text-[#0a0a0c]">
+
+            <button @click="calcRun()"
+                    class="w-7 h-[30px] flex items-center justify-center rounded-lg text-[11px] font-bold transition-colors
+                    dark:bg-profit/15 dark:hover:bg-profit/25 dark:text-profit
+                    bg-profit/10 hover:bg-profit/20 text-profit" title="Hitung">
+                =
+            </button>
+
+            <div class="px-2 h-[30px] flex items-center rounded-lg text-[11px] font-mono font-semibold min-w-[48px] justify-center truncate
+                dark:bg-white/[0.06] dark:text-[#f5f5f4]
+                bg-black/[0.04] text-[#0a0a0c]"
+                x-text="calcResult || '—'" :class="{
+                    'dark:text-profit text-profit': calcResult && calcResult !== 'Error' && calcResult !== '—' && parseFloat(calcResult) > 0,
+                    'dark:text-loss text-loss': calcResult === 'Error' || (calcResult && parseFloat(calcResult) < 0),
+                    'dark:text-[#8b8b93] text-[#6b6b70]': !calcResult || calcResult === '—'
+                }">
+            </div>
+
+            <button @click="useResult()"
+                    x-show="calcResult && calcResult !== 'Error' && calcResult !== '—'"
+                    class="w-7 h-[30px] flex items-center justify-center rounded-lg transition-colors
+                    dark:bg-profit dark:hover:brightness-110 dark:text-[#04231a]
+                    bg-profit hover:brightness-110 text-[#04231a]" title="Gunakan hasil">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
+            </button>
+        </div>
+
         <button wire:click="openCreateModal"
                 class="flex items-center gap-1.5 px-4 py-2 rounded-[9px] text-[12px] font-medium bg-white text-ink dark:bg-white dark:text-ink light:bg-ink light:text-white hover:opacity-80 transition-opacity">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Tambah Entri
-        </button>
-    </div>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Tambah Entri
+            </button>
+        </div>
 
     {{-- Bulk delete bar --}}
     @if(count($selectedIds) > 0)
