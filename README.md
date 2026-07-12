@@ -1,66 +1,168 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# TradeLedger
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Personal trading portfolio management application for XAUUSD/forex with Smart Money Concepts framing. Single-user app with multi-account isolation (Real/Demo).
 
-## About Laravel
+## Tech Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Backend:** Laravel 12 + PHP 8.2+
+- **Frontend:** Livewire 3 + Alpine.js + Tailwind CSS
+- **Charts:** ApexCharts
+- **Auth:** Laravel Breeze (Livewire stack)
+- **Database:** MySQL (Laragon, port 3308)
+- **Fonts:** Space Grotesk, Inter, JetBrains Mono
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Multi-Account Isolation** — Real & Demo accounts with full data separation via `ActiveAccountScope`
+- **Dashboard** — Stat cards, equity curve chart (ApexCharts), target rings, daily trading log table
+- **Daily Log** — CRUD entries with profit/loss/day-off status, inline calculator, bulk delete, pagination
+- **Target Rules** — Configurable target percentages (target_1/target_2), off-day toggles, full recalculation on save
+- **Deposit & Withdrawal** — CRUD with balance validation, auto-recalculation of all targets and daily logs
+- **Analytics** — Custom date range, computed stats, grouped bar chart
+- **Journal** — Timeline view with inline note editing, month filter
+- **Account Settings** — Edit account name, initial/current balance with manual recalculation
+- **Dark/Light Mode** — System-wide theme with flash prevention, localStorage persistence
+- **Responsive** — Sidebar on desktop, fixed bottom nav on mobile
 
-## Learning Laravel
+## Default Credentials
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Email | Password |
+|-------|----------|
+| `admin@tradeledger.io` | `password` |
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+# Clone repository
+git clone <repository-url>
+cd trading.app
 
-## Laravel Sponsors
+# Install dependencies
+composer install
+npm install
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Copy environment file
+cp .env.example .env
 
-### Premium Partners
+# Configure database in .env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3308
+DB_DATABASE=trading_apps
+DB_USERNAME=root
+DB_PASSWORD=
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+# Generate application key
+php artisan key:generate
 
-## Contributing
+# Run migrations
+php artisan migrate
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Seed database (30 days sample data for Real & Demo accounts)
+php artisan db:seed
 
-## Code of Conduct
+# Build frontend assets
+npm run build
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Database Schema
 
-## Security Vulnerabilities
+```
+users
+├── id, name, email, password
+├── theme_preference (dark|light)
+└── active_account_id (FK → accounts)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+accounts
+├── id, user_id (FK → users)
+├── name, type (real|demo)
+├── initial_balance, current_balance
+└── currency, is_active
 
-## License
+daily_logs
+├── id, account_id (FK → accounts)
+├── log_date (unique per account)
+├── status (profit|loss|day_off)
+├── balance, daily_percent
+├── profit_amount, loss_amount
+└── notes
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+targets
+├── id, account_id (FK → accounts)
+├── daily_log_id (FK → daily_logs, nullable)
+├── target_type (target_1|target_2)
+├── target_amount, running_amount
+└── target_closing, status
+
+transactions
+├── id, account_id (FK → accounts)
+├── type (deposit|withdrawal)
+├── amount, transaction_date
+└── notes
+
+account_rules
+├── id, account_id (FK → accounts, unique)
+├── target_1_pct, target_2_pct
+└── off_days (JSON)
+```
+
+## Routes
+
+| URI | Name | Description |
+|-----|------|-------------|
+| `/dashboard` | `dashboard` | Overview with stat cards, equity curve, daily log |
+| `/daily-log` | `daily-log` | CRUD daily trading entries |
+| `/target-rules` | `target-rules` | Configure target percentages and off-days |
+| `/deposit-withdrawal` | `deposit-withdrawal` | Manage deposits and withdrawals |
+| `/analytics` | `analytics` | Performance analytics with date range |
+| `/journal` | `journal` | Trading journal timeline |
+
+## Balance Formula
+
+```
+Balance = $0 + all deposits - all withdrawals + all P/L from daily logs
+```
+
+Recalculated via `TargetCalculationService::recalculateAllForAccount()` on every CRUD operation (daily logs, deposits, withdrawals, account settings changes).
+
+## Project Structure
+
+```
+app/
+├── Livewire/           # Livewire components
+│   ├── DashboardOverview.php
+│   ├── DailyLogTable.php
+│   ├── TargetRules.php
+│   ├── DepositWithdrawal.php
+│   ├── Analytics.php
+│   ├── Journal.php
+│   ├── AccountSwitcher.php
+│   └── AccountSettings.php
+├── Models/             # Eloquent models
+│   ├── Account.php
+│   ├── AccountRule.php
+│   ├── DailyLog.php
+│   ├── Target.php
+│   ├── Transaction.php
+│   └── Scopes/ActiveAccountScope.php
+└── Services/
+    └── TargetCalculationService.php
+
+resources/
+├── views/
+│   ├── layouts/app.blade.php        # Main layout (sidebar, topbar, bottom nav)
+│   └── livewire/                    # Livewire component views
+├── css/app.css                      # Glass-card styles, light mode overrides
+└── js/app.js
+
+database/
+├── migrations/       # 10 migrations
+├── seeders/          # DatabaseSeeder (30-day sample data)
+└── factories/        # Model factories
+```
+
+## Notes
+
+- Do not run `php artisan serve` — use Laragon's built-in server
+- MySQL runs on port `3308` (Laragon default)
+- Reference files in `references/` (mockup HTML, excel.png, prompt MD) are preserved for design reference
