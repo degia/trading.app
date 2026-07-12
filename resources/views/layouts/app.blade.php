@@ -76,11 +76,11 @@
         $pageTitle = $pageTitle ?? ($currentPage['label'] ?? 'Dashboard');
     @endphp
 
-    <div class="flex min-h-screen relative z-10">
+    <div class="flex h-screen relative z-10 overflow-hidden">
 
         {{-- Sidebar (desktop) --}}
         <aside
-            class="w-[220px] shrink-0 sticky top-0 h-screen py-6 px-4 flex-col border-r backdrop-blur-xl hidden lg:flex
+            class="w-[220px] shrink-0 h-screen py-6 px-4 flex-col border-r backdrop-blur-xl hidden lg:flex overflow-y-auto
             dark:border-white/[0.09] dark:bg-white/[0.025]
             border-black/[0.08] bg-white/50">
             <div class="flex items-center gap-2.5 mb-9 pl-1">
@@ -126,35 +126,37 @@
         </aside>
 
         {{-- Main content area --}}
-        <div class="flex-1 flex flex-col min-w-0">
+        <div class="flex-1 flex flex-col min-w-0 min-h-0 h-screen">
 
             {{-- Topbar --}}
-            <header class="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 lg:py-5 flex-wrap gap-3">
-                <div class="flex items-center gap-3">
+            <header class="shrink-0 z-30 flex items-center justify-between px-3 sm:px-6 lg:px-8 py-3 lg:py-4 gap-2
+                dark:bg-ink/80 bg-paper/80 backdrop-blur-xl
+                dark:border-b border-b dark:border-white/[0.06] border-black/[0.05]">
+                <div class="flex items-center gap-2 min-w-0 shrink-0">
                     <button @click="mobileNav = !mobileNav"
-                        class="lg:hidden p-2 -ml-2 rounded-lg dark:hover:bg-white/5 hover:bg-black/5">
+                        class="lg:hidden p-1.5 -ml-1.5 rounded-lg dark:hover:bg-white/5 hover:bg-black/5">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
                     <img src="{{ asset('img/logo-icon.png') }}" alt="TradeLedger"
-                        class="w-7 h-7 rounded-lg object-contain">
-                    <h1 class="font-display text-lg sm:text-xl font-semibold tracking-tight">
+                        class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg object-contain shrink-0">
+                    <h1 class="font-display text-base sm:text-xl font-semibold tracking-tight truncate">
                         {{ $pageTitle }}
                     </h1>
                 </div>
 
-                <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     @livewire('account-settings')
                     @livewire('account-switcher')
 
                     <button @click="toggle()"
-                        class="w-[48px] h-[26px] sm:w-[52px] sm:h-[28px] rounded-full border relative cursor-pointer transition-colors duration-300
+                        class="w-[40px] h-[22px] sm:w-[52px] sm:h-[28px] rounded-full border relative cursor-pointer transition-colors duration-300 shrink-0
                             dark:bg-white/[0.08] dark:border-white/[0.09] bg-black/[0.06] border-black/[0.08]">
-                        <div class="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px] rounded-full absolute top-[2px] left-[2px] transition-transform duration-300 flex items-center justify-center text-[11px]
+                        <div class="w-[16px] h-[16px] sm:w-[22px] sm:h-[22px] rounded-full absolute top-[2px] left-[2px] transition-transform duration-300 flex items-center justify-center text-[10px] sm:text-[11px]
                             dark:bg-[#f5f5f4] bg-[#0a0a0c]"
-                            :class="$store.theme === 'light' ? 'translate-x-[24px] sm:translate-x-[24px]' : 'translate-x-0'">
+                            :class="$store.theme === 'light' ? 'translate-x-[18px] sm:translate-x-[24px]' : 'translate-x-0'">
                             <span x-text="$store.theme === 'dark' ? '☀' : '☾'"></span>
                         </div>
                     </button>
@@ -162,9 +164,9 @@
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="submit"
-                            class="p-2 rounded-lg dark:hover:bg-white/5 hover:bg-black/5 transition-colors dark:text-[#8b8b93] text-[#6b6b70] hover:text-loss dark:hover:text-loss"
+                            class="p-1.5 sm:p-2 rounded-lg dark:hover:bg-white/5 hover:bg-black/5 transition-colors dark:text-[#8b8b93] text-[#6b6b70] hover:text-loss dark:hover:text-loss"
                             title="Logout">
-                            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 sm:w-[18px] sm:h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                             </svg>
                         </button>
@@ -172,64 +174,62 @@
                 </div>
             </header>
 
-            {{-- Mobile sidebar overlay --}}
-            <div x-show="mobileNav" x-transition:enter="transition-opacity ease-out duration-200"
-                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                x-transition:leave="transition-opacity ease-in duration-150" x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0" @click="mobileNav = false"
-                class="fixed inset-0 z-40 bg-black/60 lg:hidden" style="display:none"></div>
-
-            {{-- Mobile sidebar drawer --}}
-            <div x-show="mobileNav" x-transition:enter="transition-transform ease-out duration-200"
-                x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
-                x-transition:leave="transition-transform ease-in duration-150" x-transition:leave-start="translate-x-0"
-                x-transition:leave-end="-translate-x-full"
-                class="fixed inset-y-0 left-0 z-50 w-[240px] p-6 flex flex-col border-r backdrop-blur-xl lg:hidden
-                 dark:border-white/[0.09] dark:bg-ink-2 border-black/[0.08] bg-white"
-                style="display:none">
-                <div class="flex items-center gap-2.5 mb-9 pl-1">
-                    <div
-                        class="w-9 h-9 rounded-[10px] bg-gradient-to-br from-profit to-profit-dim flex items-center justify-center font-display font-bold text-base text-[#04231a]">
-                        T</div>
-                    <span
-                        class="font-display font-semibold text-[19px] tracking-tight dark:text-white text-black">TradeLedger</span>
-                </div>
-                <nav class="flex flex-col gap-0.5 flex-1">
-                    @foreach ($navItems as $item)
-                        @php
-                            $isActive =
-                                $currentRoute === $item['route'] ||
-                                ($item['slug'] === 'dashboard' && $currentRoute === 'dashboard');
-                            $href = $item['route'] ? route($item['route']) : '#';
-                        @endphp
-                        <a href="{{ $href }}" wire:navigate @click="mobileNav = false"
-                            class="flex items-center gap-2.5 py-2.5 px-3 rounded-[10px] text-[13.5px] transition-all duration-200
-                           {{ $isActive ? 'bg-white/[0.06] dark:text-white text-black' : 'dark:text-[#8b8b93] text-[#6b6b70] dark:hover:text-white hover:text-black' }}">
-                            <span
-                                class="w-1.5 h-1.5 rounded-full shrink-0 {{ $isActive ? 'bg-profit' : 'bg-current opacity-50' }}"></span>
-                            {{ $item['label'] }}
-                        </a>
-                    @endforeach
-                </nav>
-
-                <div class="pt-5 mt-5 border-t dark:border-white/[0.09] border-black/[0.08]">
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit"
-                            class="flex items-center gap-2.5 py-2.5 px-3 rounded-[10px] text-[13.5px] w-full transition-all duration-200 dark:text-[#8b8b93] text-[#6b6b70] hover:text-loss dark:hover:text-loss">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                            </svg>
-                            Logout
-                        </button>
-                    </form>
-                </div>
-            </div>
-
             {{-- Page content --}}
-            <main class="px-4 sm:px-6 lg:px-8 pb-24 lg:pb-8 flex-1">
+            <main class="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 lg:px-8 pb-24 lg:pb-8">
                 {{ $slot }}
             </main>
+        </div>
+    </div>
+
+    {{-- Mobile sidebar overlay --}}
+    <div x-show="mobileNav" x-transition:enter="transition-opacity ease-out duration-200"
+        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+        x-transition:leave="transition-opacity ease-in duration-150" x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0" @click="mobileNav = false"
+        class="fixed inset-0 z-[70] bg-black/60 lg:hidden" style="display:none"></div>
+
+    {{-- Mobile sidebar drawer --}}
+    <div x-show="mobileNav" x-transition:enter="transition-transform ease-out duration-200"
+        x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition-transform ease-in duration-150" x-transition:leave-start="translate-x-0"
+        x-transition:leave-end="-translate-x-full"
+        class="fixed inset-y-0 left-0 z-[80] w-[240px] p-6 flex flex-col border-r backdrop-blur-xl lg:hidden
+         dark:border-white/[0.09] dark:bg-ink-2 border-black/[0.08] bg-white"
+        style="display:none">
+        <div class="flex items-center gap-2.5 mb-9 pl-1">
+            <img src="{{ asset('img/logo-icon.png') }}" alt="TradeLedger"
+                class="w-9 h-9 rounded-[10px] object-contain">
+            <span class="font-display font-semibold text-[19px] tracking-tight dark:text-white text-black">TradeLedger</span>
+        </div>
+        <nav class="flex flex-col gap-0.5 flex-1">
+            @foreach ($navItems as $item)
+                @php
+                    $isActive =
+                        $currentRoute === $item['route'] ||
+                        ($item['slug'] === 'dashboard' && $currentRoute === 'dashboard');
+                    $href = $item['route'] ? route($item['route']) : '#';
+                @endphp
+                <a href="{{ $href }}" wire:navigate @click="mobileNav = false"
+                    class="flex items-center gap-2.5 py-2.5 px-3 rounded-[10px] text-[13.5px] transition-all duration-200
+                   {{ $isActive ? 'bg-white/[0.06] dark:text-white text-black' : 'dark:text-[#8b8b93] text-[#6b6b70] dark:hover:text-white hover:text-black' }}">
+                    <span
+                        class="w-1.5 h-1.5 rounded-full shrink-0 {{ $isActive ? 'bg-profit' : 'bg-current opacity-50' }}"></span>
+                    {{ $item['label'] }}
+                </a>
+            @endforeach
+        </nav>
+
+        <div class="pt-5 mt-5 border-t dark:border-white/[0.09] border-black/[0.08]">
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit"
+                    class="flex items-center gap-2.5 py-2.5 px-3 rounded-[10px] text-[13.5px] w-full transition-all duration-200 dark:text-[#8b8b93] text-[#6b6b70] hover:text-loss dark:hover:text-loss">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    Logout
+                </button>
+            </form>
         </div>
     </div>
 

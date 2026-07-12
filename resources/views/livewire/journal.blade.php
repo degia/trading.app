@@ -1,7 +1,7 @@
 <div class="py-6 space-y-5">
 
     {{-- Header --}}
-    <div class="flex items-center justify-between flex-wrap gap-3">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
             <h2 class="font-display text-2xl font-bold tracking-tight">Journal</h2>
             <p class="mt-1 text-sm dark:text-[#8b8b93] text-[#6b6b70]">

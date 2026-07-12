@@ -1,13 +1,13 @@
 <div x-data="{ open: false }" @click.away="open = false" @keydown.escape.window="open = false" class="relative">
     <button @click="open = !open"
-            class="flex items-center gap-1.5 px-3.5 py-[7px] rounded-full text-xs font-medium border transition-all duration-200
+            class="flex items-center gap-1.5 px-2 sm:px-3.5 py-[7px] rounded-full text-xs font-medium border transition-all duration-200
             {{ $this->activeType === 'real'
                 ? 'bg-profit/10 text-profit border-profit/25'
                 : 'bg-target/10 text-target border-target/25' }}">
-        <span class="w-1.5 h-1.5 rounded-full shadow-[0_0_0_3px_rgba(32,227,162,0.2)]
+        <span class="w-1.5 h-1.5 rounded-full shrink-0 shadow-[0_0_0_3px_rgba(32,227,162,0.2)]
             {{ $this->activeType === 'real' ? 'bg-profit' : 'bg-target' }}"></span>
-        {{ $this->activeType === 'real' ? 'Real Account' : 'Demo Account' }}
-        <svg class="w-3.5 h-3.5 ml-0.5 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <span class="hidden sm:inline">{{ $this->activeType === 'real' ? 'Real Account' : 'Demo Account' }}</span>
+        <svg class="w-3.5 h-3.5 sm:ml-0.5 transition-transform duration-200 shrink-0" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
         </svg>
     </button>

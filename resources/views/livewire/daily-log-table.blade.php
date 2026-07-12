@@ -3,7 +3,7 @@
         <div class="mb-4 p-3 rounded-[10px] bg-loss/10 text-loss text-sm font-body">{{ session('error') }}</div>
     @endif
 
-    <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-5 gap-3">
         <div class="flex items-center gap-3">
             <select wire:model.live="selectedMonth"
                     class="bg-white/[0.06] dark:bg-white/[0.06] border border-white/[0.09] dark:border-white/[0.09] rounded-[9px] px-3 py-2 text-[12px] font-mono text-[#8b8b93] dark:text-[#8b8b93] outline-none focus:border-profit/40 transition-colors cursor-pointer">
@@ -21,7 +21,7 @@
             </select>
         </div>
 
-        <div class="flex items-center gap-1" x-data="{
+        <div class="flex items-center gap-1 flex-wrap" x-data="{
             calcA: '',
             calcB: '',
             calcOp: '+',
