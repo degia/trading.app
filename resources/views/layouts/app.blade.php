@@ -148,7 +148,6 @@
                 </div>
 
                 <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                    @livewire('account-settings')
                     @livewire('account-switcher')
 
                     <button @click="toggle()"
@@ -180,6 +179,9 @@
             </main>
         </div>
     </div>
+
+    {{-- Account Settings Modal (rendered at body level, outside header stacking context) --}}
+    @livewire('account-settings')
 
     {{-- Mobile sidebar overlay --}}
     <div x-show="mobileNav" x-transition:enter="transition-opacity ease-out duration-200"
