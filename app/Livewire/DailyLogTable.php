@@ -102,7 +102,28 @@ class DailyLogTable extends Component
             $query->where('status', $this->selectedStatus);
         }
 
-        return $query->paginate($this->perPage);
+        $logs = $query->paginate($this->perPage);
+
+        $allMonthLogs = DailyLog::withoutGlobalScope(ActiveAccountScope::class)
+            ->where('account_id', $account->id)
+            ->whereYear('log_date', $carbon->year)
+            ->whereMonth('log_date', $carbon->month)
+            ->select('id', 'log_date', 'balance')
+            ->orderBy('log_date')
+            ->get();
+
+        $prevBalanceMap = [];
+        $prevBalance = (float) $account->initial_balance;
+        foreach ($allMonthLogs as $ml) {
+            $prevBalanceMap[$ml->id] = $prevBalance;
+            $prevBalance = (float) $ml->balance;
+        }
+
+        foreach ($logs as $log) {
+            $log->balance_kemarin = $prevBalanceMap[$log->id] ?? 0;
+        }
+
+        return $logs;
     }
 
     public function updatedSelectedMonth(): void
