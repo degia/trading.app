@@ -55,18 +55,21 @@ class TargetCalculationService
             $target5Amount = $rules->getTarget1Amount($newBalance);
             $target10Amount = $rules->getTarget2Amount($newBalance);
             $dailyPct = 0;
-        } elseif ($log->status === 'profit') {
-            $profitAmt = (float) $log->profit_amount;
-            $newBalance = ($prevLog ? (float) $prevLog->balance : (float) $account->current_balance) + $profitAmt;
-            $running5 = $prevRunning5 + $profitAmt;
-            $running10 = $prevRunning10 + $profitAmt;
-            $dailyPct = round(($profitAmt / $newBalance) * 100, 2);
         } else {
-            $lossAmt = (float) $log->loss_amount;
-            $newBalance = ($prevLog ? (float) $prevLog->balance : (float) $account->current_balance) - $lossAmt;
-            $running5 = $prevRunning5 - $lossAmt;
-            $running10 = $prevRunning10 - $lossAmt;
-            $dailyPct = round(($lossAmt / $newBalance) * -100, 2);
+            $prevBalance = $prevLog ? (float) $prevLog->balance : (float) $account->current_balance;
+            if ($log->status === 'profit') {
+                $profitAmt = (float) $log->profit_amount;
+                $newBalance = $prevBalance + $profitAmt;
+                $running5 = $prevRunning5 + $profitAmt;
+                $running10 = $prevRunning10 + $profitAmt;
+                $dailyPct = $prevBalance > 0 ? round(($profitAmt / $prevBalance) * 100, 2) : 0;
+            } else {
+                $lossAmt = (float) $log->loss_amount;
+                $newBalance = $prevBalance - $lossAmt;
+                $running5 = $prevRunning5 - $lossAmt;
+                $running10 = $prevRunning10 - $lossAmt;
+                $dailyPct = $prevBalance > 0 ? round(($lossAmt / $prevBalance) * -100, 2) : 0;
+            }
         }
 
         $log->update([
@@ -140,18 +143,21 @@ class TargetCalculationService
                 $target5Amount = $rules->getTarget1Amount($newBalance);
                 $target10Amount = $rules->getTarget2Amount($newBalance);
                 $dailyPct = 0;
-            } elseif ($log->status === 'profit') {
-                $profitAmt = (float) $log->profit_amount;
-                $newBalance = $lastBalance + $profitAmt;
-                $running5 += $profitAmt;
-                $running10 += $profitAmt;
-                $dailyPct = round(($profitAmt / $newBalance) * 100, 2);
             } else {
-                $lossAmt = (float) $log->loss_amount;
-                $newBalance = $lastBalance - $lossAmt;
-                $running5 -= $lossAmt;
-                $running10 -= $lossAmt;
-                $dailyPct = round(($lossAmt / $newBalance) * -100, 2);
+                $prevBalance = $lastBalance;
+                if ($log->status === 'profit') {
+                    $profitAmt = (float) $log->profit_amount;
+                    $newBalance = $prevBalance + $profitAmt;
+                    $running5 += $profitAmt;
+                    $running10 += $profitAmt;
+                    $dailyPct = $prevBalance > 0 ? round(($profitAmt / $prevBalance) * 100, 2) : 0;
+                } else {
+                    $lossAmt = (float) $log->loss_amount;
+                    $newBalance = $prevBalance - $lossAmt;
+                    $running5 -= $lossAmt;
+                    $running10 -= $lossAmt;
+                    $dailyPct = $prevBalance > 0 ? round(($lossAmt / $prevBalance) * -100, 2) : 0;
+                }
             }
 
             $log->update([
@@ -253,18 +259,21 @@ class TargetCalculationService
                 $target5Amount = $rules->getTarget1Amount($balance);
                 $target10Amount = $rules->getTarget2Amount($balance);
                 $dailyPct = 0;
-            } elseif ($log->status === 'profit') {
-                $profitAmt = (float) $log->profit_amount;
-                $balance += $profitAmt;
-                $running5 += $profitAmt;
-                $running10 += $profitAmt;
-                $dailyPct = round(($profitAmt / $balance) * 100, 2);
             } else {
-                $lossAmt = (float) $log->loss_amount;
-                $balance -= $lossAmt;
-                $running5 -= $lossAmt;
-                $running10 -= $lossAmt;
-                $dailyPct = round(($lossAmt / $balance) * -100, 2);
+                $prevBalance = $balance;
+                if ($log->status === 'profit') {
+                    $profitAmt = (float) $log->profit_amount;
+                    $balance += $profitAmt;
+                    $running5 += $profitAmt;
+                    $running10 += $profitAmt;
+                    $dailyPct = $prevBalance > 0 ? round(($profitAmt / $prevBalance) * 100, 2) : 0;
+                } else {
+                    $lossAmt = (float) $log->loss_amount;
+                    $balance -= $lossAmt;
+                    $running5 -= $lossAmt;
+                    $running10 -= $lossAmt;
+                    $dailyPct = $prevBalance > 0 ? round(($lossAmt / $prevBalance) * -100, 2) : 0;
+                }
             }
 
             $balance = round($balance, 2);
